@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import mongoose from "mongoose";
 import session from "express-session";
 import cors from "cors";
 import UserRoutes from "./Kambaz/Users/routes.js";
@@ -9,6 +10,8 @@ import Database from "./Kambaz/Database/index.js";
 import EnrollmentRoutes from "./Kambaz/Enrollments/routes.js";
 import Lab5 from "./Lab5/index.js";
 
+const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz"
+mongoose.connect(CONNECTION_STRING);
 const app = express();
 
 // CORS configuration - MUST come before session
