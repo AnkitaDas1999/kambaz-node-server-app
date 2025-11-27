@@ -1,5 +1,6 @@
 import UsersDao from "./dao.js";
 import EnrollmentsDao from "../Enrollments/dao.js";
+import CoursesDao from "../Courses/dao.js";
 
 export default function UserRoutes(app) {
   const dao = UsersDao();
@@ -99,6 +100,28 @@ export default function UserRoutes(app) {
     }
   };
 
+  const createCourse = async (req, res) => {
+    try {
+      const currentUser = req.session["currentUser"];
+      if (!currentUser) {
+        res.sendStatus(401);
+        return;
+      }
+
+      // Forward to courses API
+      const coursesDao = CoursesDao();
+      const enrollmentsDao = EnrollmentsDao();
+
+      const newCourse = await coursesDao.createCourse(req.body);
+      await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
+      res.json(newCourse);
+    } catch (error) {
+      console.error("Error creating course:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  app.post("/api/users/current/courses", createCourse);
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
